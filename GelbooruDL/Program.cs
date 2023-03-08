@@ -3,6 +3,7 @@ using System;
 using System.Net;
 using GelbooruDL.Classes;
 using System.Drawing;
+using System.Linq;
 
 namespace GelbooruDL
 {
@@ -24,19 +25,20 @@ namespace GelbooruDL
             }
         start:
             Console.Write("Enter tags or url: ");
-            string input = Console.ReadLine().Trim();
-            if (input.Contains("danbooru") || input.Contains(".exe") || input.Contains(".js")) { printColour("That won't work!", ConsoleColor.Red); return; }
+            string input = Console.ReadLine().Replace(", ", " ").Trim();
+            Console.WriteLine();
+            if (input.Contains("danbooru") || input.Contains("view&id") || input.Contains(".exe") || input.Contains(".js")) { printColour("That won't work!", ConsoleColor.Red); goto start; }
 
             search(input);
             printColour("Finished job", ConsoleColor.Blue);
             Console.WriteLine();
             goto start;
         }
-
+        
         static void search(string searchString)
         {
             string url = !searchString.StartsWith("https://gelbooru.com/") ? $"https://gelbooru.com/index.php?page=post&s=list&tags={searchString}" : searchString;
-            printColour($"Searching images from {url}", ConsoleColor.White);
+            printColour($"Searching images from {url}", ConsoleColor.Blue);
 
             WebClient client = new WebClient();
             string html = client.DownloadString(url);
