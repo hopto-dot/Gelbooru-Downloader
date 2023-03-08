@@ -2,6 +2,8 @@
 
 GelbooruDL is a tool that will download images from Gelbooru then create text files with the same name containing all the tags of that image.
 
+<img src="https://github.com/hopto-dot/Gelbooru-Downloader/blob/master/GBDL.png?raw=true" width="700">
+
 #### To download images:
 * Enter the raw tags
 * You may specify the url of a gelbooru results page
