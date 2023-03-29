@@ -4,11 +4,14 @@ using System.Net;
 using GelbooruDL.Classes;
 using System.Drawing;
 using System.Linq;
+using System.Text;
+using System.Web;
 
 namespace GelbooruDL
 {
     internal class Program
     {
+        static TagTemplate tagTemplate = new TagTemplate();
         static void Main(string[] args)
         {
             Console.ForegroundColor = ConsoleColor.White;
@@ -25,9 +28,47 @@ namespace GelbooruDL
             }
         start:
             Console.Write("Enter tags or url: ");
-            string input = Console.ReadLine().Replace(", ", " ").Trim();
+            string input = Console.ReadLine().Replace(", ", " ").Trim() + " -animated -multiple_views";
             Console.WriteLine();
             if (input.Contains("danbooru") || input.Contains("view&id") || input.Contains(".exe") || input.Contains(".js")) { printColour("That won't work!", ConsoleColor.Red); goto start; }
+
+            if (input.ToLower().Contains("pages:")) {
+                string tempString = input;
+                int snipIndex = -1;
+                snipIndex = input.IndexOf("pages:") + 6;
+                tempString = tempString.Substring(snipIndex);
+                tempString = tempString.Split(" ")[0].Trim();
+                int startPage = 1;
+                int endPage = 1;
+                if (!tempString.Contains("-"))
+                {
+                    //scraping from pages 1 to X, finding out what X is
+                    startPage = int.Parse(tempString);
+                    endPage = startPage;
+                    input = input.Replace($"pages:{tempString} ", "").Trim();
+                }
+                else
+                {
+                    //scraping from pages X to Y (in format X-Y), finding out what X and Y are
+                    string[] components = tempString.Split("-");
+                    input = input.Replace($"pages:{tempString} ", "").Trim();
+
+                    try
+                    {
+                        startPage = int.Parse(components[0]);
+                        endPage = int.Parse(components[1]);
+                    }
+                    catch
+                    {
+                        printColour("Pages argument should be in the format 'pages:X-Y'");
+                        Console.WriteLine();
+                        goto start;
+                    }
+                }
+                Console.WriteLine($"Scraping from pages {startPage}-{endPage}");
+                search(input, startPage, endPage);
+                goto start;
+            }
 
             search(input);
             printColour("Finished job", ConsoleColor.Blue);
@@ -35,29 +76,39 @@ namespace GelbooruDL
             goto start;
         }
         
-        static void search(string searchString)
+        static void search(string searchString, int startPage = 1, int endPage = 1)
         {
-            string url = !searchString.StartsWith("https://gelbooru.com/") ? $"https://gelbooru.com/index.php?page=post&s=list&tags={searchString}" : searchString;
-            printColour($"Searching images from {url}", ConsoleColor.Blue);
+            for (int p = startPage; p <= endPage; p++)
+            {
+                int pageID = (p - 1) * 42;
 
-            WebClient client = new WebClient();
-            string html = client.DownloadString(url);
+                string url = !searchString.StartsWith("https://gelbooru.com/") ? $"https://gelbooru.com/index.php?page=post&s=list&tags={searchString}&pid={pageID}" : searchString;
+                printColour($"Searching page {p}", ConsoleColor.Blue);
+                printColour($"Page url: {url}", ConsoleColor.Blue);
 
-            List<Result> results = getResults(html);
-            printColour($"Found {results.Count} images", ConsoleColor.White);
+                var client = new HttpClient();
+                var request = new HttpRequestMessage(new HttpMethod("GET"), url);
+                request.Headers.TryAddWithoutValidation("cookie", "fringeBenefits=yup");
+                var response = client.SendAsync(request).Result;
+                var html = response.Content.ReadAsStringAsync().Result;
 
-            printColour($"Downloading images...", ConsoleColor.White);
-            downloadSearchResults(results);
+                List<Result> results = getResults(html);
+                printColour($"Found {results.Count} images", ConsoleColor.White);
 
-            Console.WriteLine("Done!");
+                printColour($"Downloading images...", ConsoleColor.White);
+                downloadSearchResults(results);
+            }
         }
 
         static void downloadSearchResults(List<Result> results)
         {
             foreach (Result result in results)
             {
-                result.downloadImageFromPage();
-                Thread.Sleep(1000);
+                result.downloadImageFromPage(tagTemplate);
+                if (!tagTemplate.scrapeTagsOnly)
+                {
+                    Thread.Sleep(500);
+                }
             }
         }
 
@@ -82,12 +133,20 @@ namespace GelbooruDL
                 */
 
                 string sauce = resultChildren.Attributes["src"].Value; //mhmm saucy
-                List<string> tagsList = resultChildren.Attributes["title"].Value.Split("  ")[0].Trim().Split(" ").ToList();
+                List<string> tagsList = HttpUtility.HtmlDecode(HttpUtility.HtmlDecode(resultChildren.Attributes["title"].Value)).Split("  ")[0].Trim().Split(" ").ToList();
+                tagsList = Result.orderTags(tagsList, tagTemplate);
                 string tags = string.Join(", ", tagsList);
                 string pageURL = result.ChildNodes.ToList()[1].Attributes["href"].DeEntitizeValue;
 
                 Result newResult = new Result(pageURL, tagsList, sauce);
-                results.Add(newResult);
+                if (tags.Count() >= tagTemplate.minimumTagTotal)
+                {
+                    results.Add(newResult);
+                }
+                else
+                {
+                    continue;
+                }
             }
 
             return results;
