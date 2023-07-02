@@ -150,26 +150,6 @@ namespace GelbooruDL.Classes
                 #endregion
 
                 string subfolder = "";
-                if (tags.Contains("restrained"))
-                {
-                    subfolder = "Restrained\\";
-                }
-                else if (tags.Contains("leg lock"))
-                {
-                    subfolder = "Leg lock\\";
-                }
-                else if (tags.Contains("prone bone"))
-                {
-                    subfolder = "Prone bone\\";
-                }
-                else if (tags.Contains("mating press"))
-                {
-                    subfolder = "Mating press\\";
-                }
-                else if (tags.Contains("cumdrip") || tags.Contains("excessive cum"))
-                {
-                    subfolder = "Cum\\";
-                }
                 captionFilePath = $"Downloads\\{subfolder}{filename}.txt";
 
                 string imageExtension = GetImageExtension();
@@ -236,7 +216,7 @@ namespace GelbooruDL.Classes
 
         public string removeForbiddenChars(string input)
         {
-            return input.Replace("(", "").Replace(")", "").Replace(":", "").Replace("\"", "").Replace("/", "").Replace("\\", "").Replace("|", "").Replace("?", "").Replace("*", "");
+            return input.Replace("(", "").Replace(")", "").Replace(":", "").Replace("\"", "").Replace("/", "").Replace("\\", "").Replace("|", "").Replace("?", "").Replace("*", "").Replace(">", "").Replace("<", "");
         }
     }
 }
