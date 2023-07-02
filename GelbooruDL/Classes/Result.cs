@@ -176,6 +176,7 @@ namespace GelbooruDL.Classes
 
                 if (File.Exists($"Downloads\\{subfolder}{filename}.{imageExtension}"))
                 {
+                    Program.printColour("File already exists", ConsoleColor.Green);
                     return false;
                 }
 

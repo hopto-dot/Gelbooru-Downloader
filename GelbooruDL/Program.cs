@@ -26,9 +26,9 @@ namespace GelbooruDL
                 search(searchArgument);
                 return;
             }
-        start:
+        start: // this is called after scaping or failure to provide correct arguments
             Console.Write("Enter tags or url: ");
-            string input = Console.ReadLine().Replace(", ", " ").Trim() + " -animated -multiple_views";
+            string input = Console.ReadLine().Replace(", ", " ").Trim() + " -animated";
             Console.WriteLine();
             if (input.Contains("danbooru") || input.Contains("view&id") || input.Contains(".exe") || input.Contains(".js")) { printColour("That won't work!", ConsoleColor.Red); goto start; }
 
@@ -88,7 +88,7 @@ namespace GelbooruDL
 
                 var client = new HttpClient();
                 var request = new HttpRequestMessage(new HttpMethod("GET"), url);
-                request.Headers.TryAddWithoutValidation("cookie", "fringeBenefits=yup");
+                request.Headers.TryAddWithoutValidation("cookie", "fringeBenefits=yup"); // yup
                 var response = client.SendAsync(request).Result;
                 var html = response.Content.ReadAsStringAsync().Result;
 
