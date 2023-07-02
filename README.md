@@ -24,4 +24,4 @@ Downloaded images will appear in a folder called `Downloads`. This is in the sam
 - [X] Templates: define tags you want automatically being put at the beginning of captions
 - [X] Ghost tags: define tags you don't mind being in images but not in the caption that gets saved
 - [ ] Easy scraping customisability: currently, this customisability is only accessible by editing variables in the code.
-- [ ] Pause time: define how long you want to pause between each image download (default: 1 second, to reduce risk of being ip banned)
+- [ ] Pause time: define how long you want to pause between each image download (default: 0.5 seconds, to reduce risk of being ip banned)
