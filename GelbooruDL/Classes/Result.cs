@@ -25,6 +25,11 @@ namespace GelbooruDL.Classes
             this.thumImage = thumImage;
         }
 
+        public Result(string pageURL)
+        {
+            this.pageURL = pageURL;
+        }
+
         public static List<string> orderTags(List<string> toReorderTags, TagTemplate tagTemplate = null)
         {
             List<List<string>> outputOrder = new List<List<string>>();
@@ -128,7 +133,7 @@ namespace GelbooruDL.Classes
 
         public bool downloadImageFromPage(TagTemplate tagTemplate, bool fullSize = true)
         {
-            string filename = removeForbiddenChars(GetTagSummary(tagTemplate));
+            string filename = tags.Count > 0 ? removeForbiddenChars(GetTagSummary(tagTemplate)) : "";
             string captionFilePath = $"Downloads\\{filename}.txt";
 
             if (!tagTemplate.scrapeTagsOnly)
@@ -158,6 +163,13 @@ namespace GelbooruDL.Classes
                 {
                     Program.printColour("File already exists", ConsoleColor.Green);
                     return false;
+                }
+
+
+                if (filename == "")
+                {
+                    filename = removeForbiddenChars(GetTagSummary(tagTemplate));
+                    captionFilePath = $"Downloads\\{filename}.txt";
                 }
 
                 try

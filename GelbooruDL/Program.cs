@@ -122,6 +122,8 @@ start: // this is called after scaping or failure to provide correct arguments
 
         static Result getSingleImageResult (string url)
         {
+            Result result = new Result(url);
+            result.downloadImageFromPage(tagTemplate);
 
             return null;
         }
