@@ -175,11 +175,7 @@ start: // this is called after scaping or failure to provide correct arguments
 
         static bool checkIfSoloImageURL (string userInput)
         {
-            string pattern = @"^https:\/\/gelbooru\.com\/index\.php\?page=post&s=(view|list)(&id=\d+)?(&tags=[\w\+\-]+)?$";
-            Regex regex = new Regex(pattern);
-
-            return regex.IsMatch(userInput);
-
+            return userInput.StartsWith("https://gelbooru.com/index.php?page=post&s=view&id=") && userInput.Length > 56;
         }
     }
 }
