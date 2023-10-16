@@ -6,6 +6,7 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Web;
+using System.Text.RegularExpressions;
 
 namespace GelbooruDL
 {
@@ -20,16 +21,23 @@ namespace GelbooruDL
                 Directory.CreateDirectory("Downloads");
             }
 
-            if (args.Length > 0) //if exe is called with arguments
+            if (args.Length > 0) // if exe is called with arguments
             {
                 string searchArgument = string.Join(" ", args);
                 search(searchArgument);
                 return;
             }
-        start: // this is called after scaping or failure to provide correct arguments
+start: // this is called after scaping or failure to provide correct arguments
             Console.Write("Enter tags or url: ");
             string input = Console.ReadLine().Replace(", ", " ").Trim() + " -animated";
             Console.WriteLine();
+
+            if (checkIfSoloImageURL(input))
+            {
+                getSingleImageResult(input);
+                goto start;
+            }
+
             if (input.Contains("danbooru") || input.Contains("view&id") || input.Contains(".exe") || input.Contains(".js")) { printColour("That won't work!", ConsoleColor.Red); goto start; }
 
             if (input.ToLower().Contains("pages:")) {
@@ -112,6 +120,12 @@ namespace GelbooruDL
             }
         }
 
+        static Result getSingleImageResult (string url)
+        {
+
+            return null;
+        }
+        
         static List<Result> getResults(string html)
         {
             var htmlDoc = new HtmlDocument();
@@ -157,6 +171,15 @@ namespace GelbooruDL
             Console.ForegroundColor = colour;
             Console.WriteLine(message);
             Console.ForegroundColor = ConsoleColor.White;
+        }
+
+        static bool checkIfSoloImageURL (string userInput)
+        {
+            string pattern = @"^https:\/\/gelbooru\.com\/index\.php\?page=post&s=(view|list)(&id=\d+)?(&tags=[\w\+\-]+)?$";
+            Regex regex = new Regex(pattern);
+
+            return regex.IsMatch(userInput);
+
         }
     }
 }
