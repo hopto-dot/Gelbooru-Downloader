@@ -13,7 +13,7 @@ Downloaded images will appear in a folder called `Downloads`. This is in the sam
 
 #### When specifying raw tags
 * Separate tags with a space
-* Use underscores for spaces within the tag, the same as if you're searching on any booru website. For example `black_hair`
+* Use underscores for spaces within the tag, the same as if you're searching on any booru website (for example `black_hair`)
 * You may blacklist images with tags putting prepending tags with "-". For example; "-messy_hair" (this works on the website too)
 
 ## Planned functionality
